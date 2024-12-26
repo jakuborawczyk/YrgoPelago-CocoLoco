@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking at Coco-Loco Resort</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Book a Room at Coco-Loco Resort</h1>
+    <form action="book.php" method="POST">
+        <label for="guest_name">Guest Name:</label>
+        <input type="text" id="guest_name" name="guest_name" required><br>
+
+        <label for="check_in_date">Check-in Date:</label>
+        <input type="date" id="check_in_date" name="check_in_date" required><br>
+
+        <label for="check_out_date">Check-out Date:</label>
+        <input type="date" id="check_out_date" name="check_out_date" required><br>
+
+        <label for="room_id">Room Type:</label>
+        <select id="room_id" name="room_id">
+            <option value="1">Budget</option>
+            <option value="2">Standard</option>
+            <option value="3">Luxury</option>
+        </select><br>
+
+        <label for="transfer_code">Transfer Code:</label>
+        <input type="text" id="transfer_code" name="transfer_code" required><br>
+
+        <input type="submit" value="Book Now">
+    </form>
+</body>
+</html>
