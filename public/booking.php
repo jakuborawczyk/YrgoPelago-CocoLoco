@@ -1,127 +1,147 @@
 <?php
-// Database connection
-$db_path = '../hotel_database.sqlite3';  // Update with your actual database path
-$db = new PDO("sqlite:$db_path");  // Connect to the database
 
-// Ensure POST data exists (form submission)
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Include the database connection
+require_once '../src/database.php';
 
-    // Fetch user input from the form
-    $room_id = $_POST['room_id']; // Room ID (1, 2, or 3)
-    $username = $_POST['username']; // User's name
-    $transfer_code = $_POST['transfer_code']; // Transfer Code
-    $start_date = $_POST['start_date']; // Start date (YYYY-MM-DD)
-    $end_date = $_POST['end_date']; // End date (YYYY-MM-DD)
+// API URL for Transfer Code validation
+$api_url = "https://www.yrgopelago.se/centralbank/transferCode";
 
-    // Validate required fields
-    if (empty($room_id) || empty($username) || empty($start_date) || empty($end_date) || empty($transfer_code)) {
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'All fields are required.'
-        ]);
-        exit;
-    }
+// Get POST data
+$room_id = isset($_POST['room_id']) ? (int)$_POST['room_id'] : null;
+$guest_name = htmlspecialchars(trim($_POST['username'] ?? ''));
+$check_in_date = htmlspecialchars(trim($_POST['start_date'] ?? ''));
+$check_out_date = htmlspecialchars(trim($_POST['end_date'] ?? ''));
+$transfer_code = htmlspecialchars(trim($_POST['transfer_code'] ?? ''));
 
-    // Convert dates into timestamps for comparison
-    $start_timestamp = strtotime($start_date);
-    $end_timestamp = strtotime($end_date);
-    $days = ($end_timestamp - $start_timestamp) / (60 * 60 * 24); // Calculate the number of days
-
-    // Validate the booking dates (Jan 10 to Jan 31)
-    if ($start_timestamp < strtotime('2025-01-10') || $end_timestamp > strtotime('2025-01-31') || $start_timestamp > $end_timestamp) {
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Invalid booking dates. Please select dates between January 10 and January 31.'
-        ]);
-        exit;
-    }
-
-    // Check room availability for the selected dates (using bookings table)
-    $stmt = $db->prepare('
-        SELECT COUNT(*) 
-        FROM bookings 
-        WHERE room_id = ? 
-        AND (start_date < ? AND end_date > ?)
-    ');
-    $stmt->execute([$room_id, $end_date, $start_date]);
-    $isBooked = $stmt->fetchColumn() > 0;
-
-    if ($isBooked) {
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'The selected room is not available for these dates.'
-        ]);
-        exit;
-    }
-
-    // Check if the transfer code is valid (this example assumes an external API validation)
-    $transfer_api_url = 'https://www.yrgopelago.se/centralbank/transferCode'; // Ensure this URL is correct
-    $total_cost = $days * 100; // Assume the cost per day is 100 for the selected room (adjust as necessary)
-    $transfer_code_valid = checkTransferCode($transfer_code, $total_cost, $transfer_api_url);
-
-    if (!$transfer_code_valid) {
-        echo json_encode([
-            'status' => 'error',
-            'message' => 'Invalid or used transfer code.'
-        ]);
-        exit;
-    }
-
-    // Apply discount if the stay is longer than 2 days
-    $discount = 0;
-    if ($days > 2) {
-        $discount = 0.1; // 10% discount for stays longer than 2 days
-    }
-
-    // Calculate total cost after discount
-    $total_cost_after_discount = $total_cost - ($total_cost * $discount);
-
-    // Insert the booking into the database
-    $stmt = $db->prepare('INSERT INTO bookings (room_id, guest_name, arrival_date, transfer_code) VALUES (?, ?, ?, ?)');
-    $stmt->execute([$room_id, $username, $start_date, $transfer_code]);
-    $booking_id = $db->lastInsertId(); // Get the last inserted booking ID
-
-    // JSON response with booking details
-    echo json_encode([
-        'status' => 'success',
-        'message' => 'Booking successfully made.',
-        'booking_details' => [
-            'island' => 'Main island',
-            'hotel' => 'My Luxury Hotel',
-            'arrival_date' => $start_date,
-            'departure_date' => $end_date,
-            'total_cost' => $total_cost_after_discount,
-            'stars' => 5,
-            'features' => [
-                ['name' => 'pool', 'cost' => 10],
-                ['name' => 'sauna', 'cost' => 5],
-                ['name' => 'spa', 'cost' => 15]
-            ],
-            'additional_info' => [
-                'greeting' => 'Thank you for choosing My Luxury Hotel!',
-                'imageUrl' => 'https://example.com/hotel_image.jpg'
-            ]
-        ]
-    ]);
+// Check for empty fields
+if (empty($room_id) || empty($guest_name) || empty($check_in_date) || empty($check_out_date) || empty($transfer_code)) {
+    die(json_encode(['status' => 'error', 'message' => 'All fields are required.']));
 }
 
-// Function to check if the transfer code is valid
+// Check room availability from the calendar
+$stmt = $pdo->prepare("
+    SELECT COUNT(*) 
+    FROM calendar_availability 
+    WHERE room_id = :room_id 
+    AND date BETWEEN :check_in_date AND :check_out_date
+");
+
+$stmt->execute([
+    ':room_id' => $room_id,
+    ':check_in_date' => $check_in_date,
+    ':check_out_date' => $check_out_date
+]);
+
+$isAvailable = $stmt->fetchColumn() > 0;
+error_log('Room availability: ' . ($isAvailable ? 'Available' : 'Not Available'));
+
+if (!$isAvailable) {
+    die(json_encode(['status' => 'error', 'message' => 'Room is not available for the selected dates.']));
+}
+
+// Fetch room price from the rooms table
+$stmt = $pdo->prepare("SELECT price_per_day FROM rooms WHERE room_id = :room_id");
+$stmt->execute([':room_id' => $room_id]);
+$room_price = $stmt->fetchColumn();
+
+if (!$room_price) {
+    die(json_encode(['status' => 'error', 'message' => 'Room not found.']));
+}
+
+// Calculate total cost based on number of nights
+$check_in = new DateTime($check_in_date);
+$check_out = new DateTime($check_out_date);
+$numberOfNights = $check_in->diff($check_out)->days;
+$totalCost = $numberOfNights * $room_price;
+
+// Validate the transfer code
 function checkTransferCode($transfer_code, $total_cost, $api_url) {
     $postData = json_encode([
         'transferCode' => $transfer_code,
         'totalcost' => $total_cost
     ]);
 
+    // Initialize cURL session to the API
     $ch = curl_init($api_url);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 
+    // Execute the request and get the response
     $response = curl_exec($ch);
+
+    // Log the request
+    error_log('API Request Data: ' . $postData);
+
+    if ($response === false) {
+        error_log('cURL Error: ' . curl_error($ch));
+        curl_close($ch);
+        return false; // Error in cURL request
+    }
+
     curl_close($ch);
 
+    // Decode the JSON response
     $responseData = json_decode($response, true);
-    return isset($responseData['status']) && $responseData['status'] === 'success';
+
+    // Log the response for debugging
+    error_log('API Response: ' . $response);
+
+    if ($responseData && isset($responseData['status']) && $responseData['status'] === 'success') {
+        return true;  // Transfer code is valid
+    } else {
+        error_log('Transfer code validation failed: ' . print_r($responseData, true));
+        return false;  // Invalid or used transfer code
+    }
 }
+
+if (!checkTransferCode($transfer_code, $totalCost, $api_url)) {
+    die(json_encode(['status' => 'error', 'message' => 'Invalid or used transfer code.']));
+}
+
+// Proceed to insert the booking into the database
+$stmt = $pdo->prepare("
+    INSERT INTO bookings (room_id, guest_name, arrival_date, departure_date, transfer_code) 
+    VALUES (:room_id, :guest_name, :check_in_date, :check_out_date, :transfer_code)
+");
+
+if ($stmt->execute([
+    ':room_id' => $room_id,
+    ':guest_name' => $guest_name,
+    ':check_in_date' => $check_in_date,
+    ':check_out_date' => $check_out_date,
+    ':transfer_code' => $transfer_code
+])) {
+    // Booking successful, return JSON response
+    $response = [
+        "status" => "success",
+        "booking_details" => [
+            "hotel" => "Coco-Loco Resort",
+            "arrival_date" => $check_in_date,
+            "departure_date" => $check_out_date,
+            "total_cost" => $totalCost,
+            "stars" => "4",
+            "features" => [
+                [
+                    "name" => "Pool Access",
+                    "cost" => "$8"
+                ]
+            ],
+            "additional_info" => [
+                "greeting" => "Thank you for choosing Coco-Loco Resort",
+                "imageUrl" => "https://giphy.com/gifs/adultswim-liBsVeLILcyaY"
+            ]
+        ]
+    ];
+
+    header('Content-Type: application/json');
+    echo json_encode($response, JSON_PRETTY_PRINT);
+    exit;
+} else {
+    // Log the error if insertion fails
+    error_log('Booking insertion failed: ' . print_r($stmt->errorInfo(), true));
+    die(json_encode(['status' => 'error', 'message' => 'Booking failed.']));
+}
+
 ?>
