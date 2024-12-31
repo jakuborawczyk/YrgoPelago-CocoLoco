@@ -130,7 +130,7 @@ if ($stmt->execute([
             ],
             "additional_info" => [
                 "greeting" => "Thank you for choosing Coco-Loco Resort",
-                "imageUrl" => "https://giphy.com/gifs/adultswim-liBsVeLILcyaY"
+                "imageUrl" => "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzY3YWozZXhjMjhsd3Vtb3Brcm10Y2p0cGp0Z3hwNnlqc21qZXVyaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/gFjqVrBTw1zNPhd7Ms/giphy.gif"
             ]
         ]
     ];
