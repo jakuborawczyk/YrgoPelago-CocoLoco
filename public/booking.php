@@ -1,7 +1,8 @@
 <?php
 
-// Include the database connection
+// Include the Connections
 require_once '../src/database.php';
+require_once 'functions.php';
 
 // API URL for Transfer Code validation
 $api_url = "https://www.yrgopelago.se/centralbank/transferCode";
@@ -12,6 +13,9 @@ $guest_name = htmlspecialchars(trim($_POST['username'] ?? ''));
 $check_in_date = htmlspecialchars(trim($_POST['start_date'] ?? ''));
 $check_out_date = htmlspecialchars(trim($_POST['end_date'] ?? ''));
 $transfer_code = htmlspecialchars(trim($_POST['transfer_code'] ?? ''));
+
+
+
 
 // Check for empty fields
 if (empty($room_id) || empty($guest_name) || empty($check_in_date) || empty($check_out_date) || empty($transfer_code)) {
@@ -105,7 +109,6 @@ $stmt = $pdo->prepare("
     INSERT INTO bookings (room_id, guest_name, arrival_date, departure_date, transfer_code) 
     VALUES (:room_id, :guest_name, :check_in_date, :check_out_date, :transfer_code)
 ");
-
 if ($stmt->execute([
     ':room_id' => $room_id,
     ':guest_name' => $guest_name,
@@ -114,6 +117,15 @@ if ($stmt->execute([
     ':transfer_code' => $transfer_code
 ])) {
     // Booking successful, return JSON response
+    $features = $_POST['features'];
+    $featuresArray = [];
+    foreach ($features as $feature) {
+        $featuresArray[] = [
+            "name" => $feature,
+            "cost" => getFeatureCost($feature) // Get the cost of the feature
+        ];
+    }
+
     $response = [
         "status" => "success",
         "booking_details" => [
@@ -122,12 +134,7 @@ if ($stmt->execute([
             "departure_date" => $check_out_date,
             "total_cost" => $totalCost,
             "stars" => "4",
-            "features" => [
-                [
-                    "name" => "Pool Access",
-                    "cost" => "$8"
-                ]
-            ],
+            "features" => $featuresArray,
             "additional_info" => [
                 "greeting" => "Thank you for choosing Coco-Loco Resort",
                 "imageUrl" => "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzY3YWozZXhjMjhsd3Vtb3Brcm10Y2p0cGp0Z3hwNnlqc21qZXVyaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/gFjqVrBTw1zNPhd7Ms/giphy.gif"
