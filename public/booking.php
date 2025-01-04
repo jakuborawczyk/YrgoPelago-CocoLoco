@@ -15,8 +15,6 @@ $check_out_date = htmlspecialchars(trim($_POST['end_date'] ?? ''));
 $transfer_code = htmlspecialchars(trim($_POST['transfer_code'] ?? ''));
 
 
-
-
 // Check for empty fields
 if (empty($room_id) || empty($guest_name) || empty($check_in_date) || empty($check_out_date) || empty($transfer_code)) {
     die(json_encode(['status' => 'error', 'message' => 'All fields are required.']));
@@ -57,7 +55,9 @@ $check_in = new DateTime($check_in_date);
 $check_out = new DateTime($check_out_date);
 $numberOfNights = $check_in->diff($check_out)->days;
 $totalCost = $numberOfNights * $room_price;
-
+foreach ($features as $feature) {
+    $totalCost += getFeatureCost($feature);
+}
 // Validate the transfer code
 function checkTransferCode($transfer_code, $total_cost, $api_url) {
     $postData = json_encode([
