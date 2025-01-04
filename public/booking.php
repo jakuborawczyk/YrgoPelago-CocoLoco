@@ -2,7 +2,7 @@
 
 // Include the Connections
 require_once '../src/database.php';
-require_once 'functions.php';
+require_once '../src/functions.php';
 
 // API URL for Transfer Code validation
 $api_url = "https://www.yrgopelago.se/centralbank/transferCode";
@@ -51,11 +51,11 @@ if (!$room_price) {
 }
 
 // Calculate total cost based on number of nights
-$check_in = new DateTime($check_in_date);
-$check_out = new DateTime($check_out_date);
-$numberOfNights = $check_in->diff($check_out)->days;
-$totalCost = $numberOfNights * $room_price;
-foreach ($features as $feature) {
+$check_in = new DateTime($check_in_date);// Convert the check-in and check-out dates to DateTime objects
+$check_out = new DateTime($check_out_date);// Convert the check-in and check-out dates to DateTime objects
+$numberOfNights = $check_in->diff($check_out)->days;// Calculate the number of nights
+$totalCost = $numberOfNights * $room_price; // Total cost for the room
+foreach ($features as $feature) { // Loop through selected features to add to the total cost
     $totalCost += getFeatureCost($feature);
 }
 // Validate the transfer code
@@ -67,7 +67,7 @@ function checkTransferCode($transfer_code, $total_cost, $api_url) {
 
     // Initialize cURL session to the API
     $ch = curl_init($api_url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
     curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
@@ -99,7 +99,7 @@ function checkTransferCode($transfer_code, $total_cost, $api_url) {
         return false;  // Invalid or used transfer code
     }
 }
-
+// Check if the transfer code is valid
 if (!checkTransferCode($transfer_code, $totalCost, $api_url)) {
     die(json_encode(['status' => 'error', 'message' => 'Invalid or used transfer code.']));
 }
@@ -125,7 +125,7 @@ if ($stmt->execute([
             "cost" => getFeatureCost($feature) // Get the cost of the feature
         ];
     }
-
+ // Return the booking details in JSON format
     $response = [
         "status" => "success",
         "booking_details" => [
