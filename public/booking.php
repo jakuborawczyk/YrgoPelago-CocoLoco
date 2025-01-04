@@ -16,7 +16,7 @@ $transfer_code = htmlspecialchars(trim($_POST['transfer_code'] ?? ''));
 
 
 // Check for empty fields
-if (empty($room_id) || empty($guest_name) || empty($check_in_date) || empty($check_out_date) || empty($transfer_code)) {
+if (empty($room_id) || empty($guest_name) || empty($check_in_date) || empty($check_out_date) || empty($transfer_code) ) {
     die(json_encode(['status' => 'error', 'message' => 'All fields are required.']));
 }
 
@@ -58,6 +58,17 @@ $totalCost = $numberOfNights * $room_price; // Total cost for the room
 foreach ($features as $feature) { // Loop through selected features to add to the total cost
     $totalCost += getFeatureCost($feature);
 }
+
+// Calculate the discount based on the number of nights
+if ($numberOfNights >= 3) {
+    $discount = 0.30; // 30% discount for bookings longer than 3 days
+    $discountReason = 'Guest stayed for ' . $numberOfNights . ' nights, eligible for 30% long stay discount';
+    $totalCost = $totalCost * (1 - $discount);
+} else {
+    $discount = 0;
+    $discountReason = '';
+}
+
 // Validate the transfer code
 function checkTransferCode($transfer_code, $total_cost, $api_url) {
     $postData = json_encode([
@@ -106,15 +117,18 @@ if (!checkTransferCode($transfer_code, $totalCost, $api_url)) {
 
 // Proceed to insert the booking into the database
 $stmt = $pdo->prepare("
-    INSERT INTO bookings (room_id, guest_name, arrival_date, departure_date, transfer_code) 
-    VALUES (:room_id, :guest_name, :check_in_date, :check_out_date, :transfer_code)
+    INSERT INTO bookings (room_id, guest_name, arrival_date, departure_date, transfer_code, discount, discount_reason, total_cost) 
+    VALUES (:room_id, :guest_name, :check_in_date, :check_out_date, :transfer_code, :discount, :discount_reason, :total_cost)
 ");
 if ($stmt->execute([
     ':room_id' => $room_id,
     ':guest_name' => $guest_name,
     ':check_in_date' => $check_in_date,
     ':check_out_date' => $check_out_date,
-    ':transfer_code' => $transfer_code
+    ':transfer_code' => $transfer_code,
+    ':discount' => $discount,
+    ':discount_reason' => $discountReason,
+    ':total_cost' => $totalCost
 ])) {
     // Booking successful, return JSON response
     $features = $_POST['features'];
