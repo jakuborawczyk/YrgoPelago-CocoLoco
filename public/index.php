@@ -1,3 +1,8 @@
+<?php 
+declare(strict_types=1);
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,7 +39,6 @@
         <input type="date" id="end_date" name="end_date" value="2025-01-11" min="2025-01-10" max="2025-01-31" required><br>
 
         <input type="submit" value="Book Room">
-        <p class="total-cost">Total Cost: <?php echo $totalCost ?></p>
     </form>
 
     <div id="response"></div>

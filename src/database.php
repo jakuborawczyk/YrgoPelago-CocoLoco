@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 // Set up a PDO connection to your SQLite database
 try {
     $pdo = new PDO('sqlite:../hotel_database.sqlite3');  // Path to your SQLite database
