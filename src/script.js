@@ -27,4 +27,15 @@ document.getElementById('bookingForm').addEventListener('submit', function(event
 });
 
 
+const roomPrices = {
+    '1': 8,  // Luxury Room
+    '2': 5,  // Standard Room
+    '3': 3   // Economy Room
+};
+
+const featurePrices = {
+    'Pool Access ($3)': 3,
+    'Breakfast ($5)': 5,
+    'Gym Access ($3)': 3
+};
 

@@ -55,9 +55,7 @@ $check_in = new DateTime($check_in_date);// Convert the check-in and check-out d
 $check_out = new DateTime($check_out_date);// Convert the check-in and check-out dates to DateTime objects
 $numberOfNights = $check_in->diff($check_out)->days;// Calculate the number of nights
 $totalCost = $numberOfNights * $room_price; // Total cost for the room
-foreach ($features as $feature) { // Loop through selected features to add to the total cost
-    $totalCost += getFeatureCost($feature);
-}
+
 
 // Calculate the discount based on the number of nights
 if ($numberOfNights >= 3) {
