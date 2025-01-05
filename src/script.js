@@ -25,3 +25,6 @@ document.getElementById('bookingForm').addEventListener('submit', function(event
         document.getElementById('response').innerHTML = `<p>Error: Unable to process the booking</p>`;
     });
 });
+
+
+

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hotel Booking</title>
+    <title>Coco-Loco Resort</title>
     <link rel="stylesheet" href="../src/styles.css">
 </head>
 <body>
@@ -15,11 +15,12 @@
             <option value="2">Standard Room</option>
             <option value="3">Economy Room</option>
         </select><br>
+        <label for="features">Select Features:</label>
         <select name="features" id="features" multiple>
-        <option value="Pool Access">Pool Access ($8)</option>
-        <option value="Breakfast">Breakfast ($10)</option>
-        <option value="Gym Access">Gym Access ($5)</option>
-    </select>
+            <option value="Pool Access">Pool Access ($8)</option>
+            <option value="Breakfast">Breakfast ($10)</option>
+            <option value="Gym Access">Gym Access ($5)</option>
+        </select>
         <label for="username">Username:</label>
         <input type="text" id="username" name="username" required><br>
 
@@ -33,6 +34,7 @@
         <input type="date" id="end_date" name="end_date" value="2025-01-11" min="2025-01-10" max="2025-01-31" required><br>
 
         <input type="submit" value="Book Room">
+        <p class="total-cost">Total Cost: <?php echo $totalCost ?></p>
     </form>
 
     <div id="response"></div>
