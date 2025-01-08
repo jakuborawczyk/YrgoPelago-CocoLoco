@@ -155,8 +155,7 @@ declare(strict_types=1);
         const result = await response.json();
 
         if (result.status === 'success') {
-            const newWindow = window.open('', '_blank');
-            newWindow.document.write('<pre>' + JSON.stringify(result, null, 2) + '</pre>');
+            window.location.href = 'success.php?response=' + encodeURIComponent(JSON.stringify(result));
         } else {
             alert(result.message || 'Booking failed.');
         }

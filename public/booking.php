@@ -67,6 +67,19 @@ if ($numberOfNights >= 3) {
     $discountReason = '';
 }
 
+$feature = $_POST['feature'];
+
+if ($feature == 'pool') {
+    // User chose feature 1
+    $totalCost += 3;
+} elseif ($feature == 'breakfast') {
+    // User chose feature 2
+    $totalCost += 5;
+} elseif ($feature == 'gym') {
+    // User chose feature 3
+    $totalCost += 3;
+}
+
 // Validate the transfer code
 function checkTransferCode($transfer_code, $total_cost, $api_url) {
     $postData = json_encode([
@@ -128,15 +141,7 @@ if ($stmt->execute([
     ':discount_reason' => $discountReason,
     ':total_cost' => $totalCost
 ])) {
-    // Booking successful, return JSON response
-    $features = $_POST['features'];
-    $featuresArray = [];
-    foreach ($features as $feature) {
-        $featuresArray[] = [
-            "name" => $feature,
-            "cost" => getFeatureCost($feature) // Get the cost of the feature
-        ];
-    }
+   
  // Return the booking details in JSON format
     $response = [
         "status" => "success",
@@ -148,7 +153,7 @@ if ($stmt->execute([
             "stars" => "4",
             "additional_info" => [
                 "greeting" => "Thank you for choosing Coco-Loco Resort",
-                "imageUrl" => "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzY3YWozZXhjMjhsd3Vtb3Brcm10Y2p0cGp0Z3hwNnlqc21qZXVyaiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/gFjqVrBTw1zNPhd7Ms/giphy.gif"
+                "imageUrl" => "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTNjMDBpbmRra3d2cHpqNW5wMjJwaWExYWZxbDF6bDF2aTBkcWtzdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6R8hckRI78mlPJ3cjn/giphy.gif"
             ]
         ]
     ];
