@@ -143,27 +143,28 @@ declare(strict_types=1);
 
         // Form submission
         document.getElementById('bookingForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
+    e.preventDefault();
 
-            try {
-                const formData = new FormData(this);
-                const response = await fetch('booking.php', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    document.getElementById('booking-status').textContent = JSON.stringify(result, null, 2);
-                } else {
-                    alert(result.message || 'Booking failed.');
-                }
-            } catch (error) {
-                alert('Error submitting booking.');
-                console.error('Error:', error);
-            }
+    try {
+        const formData = new FormData(this);
+        const response = await fetch('booking.php', {
+            method: 'POST',
+            body: formData
         });
+
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            const newWindow = window.open('', '_blank');
+            newWindow.document.write('<pre>' + JSON.stringify(result, null, 2) + '</pre>');
+        } else {
+            alert(result.message || 'Booking failed.');
+        }
+    } catch (error) {
+        alert('Error submitting booking.');
+        console.error('Error:', error);
+    }
+});
 
         // Initialize calculation
         calculateTotalCost();
