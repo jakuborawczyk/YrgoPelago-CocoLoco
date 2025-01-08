@@ -1,9 +1,9 @@
 <?php
 function getFeatureCost($featureName) {
     $featureCosts = [
-        "Pool Access" => 8,
-        "Breakfast" => 10,
-        "Gym Access" => 5,
+        "Pool Access" => 3,
+        "Breakfast" => 5,
+        "Gym Access" => 3,
         // Add more features and their costs here
     ];
 
