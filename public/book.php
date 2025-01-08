@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 ?>
-<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 
@@ -81,7 +80,7 @@ declare(strict_types=1);
         <div id="response"></div>
     </div>
 
-    <script src="../src/booking.js"></script>
+    <script src="../src/script.js"></script>
 </body>
 
 </html>

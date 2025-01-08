@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coco-Loco Resort</title>
+  <title>Coco-Loco Resort</title>
     <link rel="stylesheet" href="../src/styles.css">
 </head>
 <body>
-<nav class="navbar">
+  <nav class="navbar">
     <ul>
       <li><a href="#home">Home</a></li>
       <li><a href="#rooms">Rooms</a></li>
@@ -16,11 +14,11 @@
     </ul>
   </nav>
 
-  <div id="home" class="hero animate__animated animate__fadeIn">
+  <div id="home" class="hero" style="animation: fadeIn 1s ease-out;">
     <div class="hero-content">
-      <h1 class="animate__animated animate__fadeInDown">Coco-Loco Resort</h1>
-      <p class="animate__animated animate__fadeInUp">Your Paradise Getaway Awaits</p>
-      <a href="#rooms" class="btn animate__animated animate__fadeInUp">Explore Rooms</a>
+    <h1 style="animation: fadeInDown 1s ease-out;">Coco-Loco Resort</h1>
+    <p style="animation: fadeInUp 1s ease-out;">Your Paradise Getaway Awaits</p>
+      <a href="#rooms" class="btn" style="animation: fadeInUp 1s ease-out;" >Explore Rooms</a>
     </div>
     <div class="scroll-indicator">↓</div>
   </div>
@@ -29,7 +27,7 @@
     <h2 class="section-title scroll-reveal">Our Accommodations</h2>
     <div class="room-grid">
       <div class="room-card scroll-reveal">
-        <div class="room-image" style="background-image: url('/api/placeholder/600/400')"></div>
+        <div class="room-image" style="background-image: url('../public/assets/luxury.webp')"></div>
         <div class="room-content">
           <h3>Luxury Suite</h3>
           <p>Ocean-front villa with private pool and premium amenities</p>
@@ -38,7 +36,7 @@
       </div>
 
       <div class="room-card scroll-reveal">
-        <div class="room-image" style="background-image: url('/api/placeholder/600/400')"></div>
+        <div class="room-image" style="background-image: url('../public/assets/standard.webp')"></div>
         <div class="room-content">
           <h3>Standard Room</h3>
           <p>Comfortable room with garden view and modern furnishings</p>
@@ -47,7 +45,7 @@
       </div>
 
       <div class="room-card scroll-reveal">
-        <div class="room-image" style="background-image: url('/api/placeholder/600/400')"></div>
+        <div class="room-image" style="background-image: url('../public/assets/budget.webp')"></div>
         <div class="room-content">
           <h3>Budget Room</h3>
           <p>Cozy room with essential amenities and resort access</p>
@@ -63,18 +61,21 @@
       <div class="feature-item scroll-reveal">
         <div class="feature-icon">🌴</div>
         <h3>Breakfast</h3>
-        <p>Freshly cooked breakfast served daily</p>
+        <p>Daily breakfast served on the beach</p>
       </div>
       <div class="feature-item scroll-reveal">
         <div class="feature-icon">🍹</div>
-        <h3>Minibar</h3>
+        <h3>Mini Bar</h3>
         <p>Tropical cocktails and snacks</p>
       </div>
       <div class="feature-item scroll-reveal">
         <div class="feature-icon">🌊</div>
         <h3>Private Pool</h3>
-        <p>Relax and unwind in our private pool</p>
+        <p>Indoor pool with sun loungers</p>
       </div>
+    </div>
+    <div class="buttonContainer">
+    <a href="book.php" class="btn book-btn" style="animation: fadeInUp 1s ease-out;" >Book Now</a>
     </div>
   </section>
 
@@ -90,5 +91,8 @@
         <p class="testimonial-author">- James R.</p>
       </div>
     </div>
+  </section>
+
+  <script src="../src/indexScript.js"></script>
 </body>
 </html>
