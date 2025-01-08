@@ -67,18 +67,22 @@ if ($numberOfNights >= 3) {
     $discountReason = '';
 }
 
-$feature = $_POST['feature'];
+$features = $_POST['features'];
 
-if ($feature == 'pool') {
-    // User chose feature 1
-    $totalCost += 3;
-} elseif ($feature == 'breakfast') {
-    // User chose feature 2
-    $totalCost += 5;
-} elseif ($feature == 'gym') {
-    // User chose feature 3
-    $totalCost += 3;
+foreach ($features as $feature) {
+    switch ($feature) {
+        case "pool":
+            $totalCost += 3;
+            break;
+        case "breakfast":
+            $totalCost += 5;
+            break;
+        case "gym":
+            $totalCost += 3;
+            break;
+    }
 }
+
 
 // Validate the transfer code
 function checkTransferCode($transfer_code, $total_cost, $api_url) {
@@ -151,6 +155,7 @@ if ($stmt->execute([
             "departure_date" => $check_out_date,
             "total_cost" => $totalCost,
             "stars" => "4",
+            "discount" => $discountReason,
             "additional_info" => [
                 "greeting" => "Thank you for choosing Coco-Loco Resort",
                 "imageUrl" => "https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTNjMDBpbmRra3d2cHpqNW5wMjJwaWExYWZxbDF6bDF2aTBkcWtzdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/6R8hckRI78mlPJ3cjn/giphy.gif"

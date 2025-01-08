@@ -1,0 +1,87 @@
+<?php
+
+declare(strict_types=1);
+
+?>
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coco-Loco Resort</title>
+    <link rel="stylesheet" href="../src/styles.css">
+</head>
+
+<body>
+    <div class="booking-form">
+        <h1>Coco-Loco Resort Booking</h1>
+
+        <form id="bookingForm" method="POST" action="booking.php">
+            <div class="form-group">
+                <label for="room_id">Select Room:</label>
+                <select name="room_id" id="room_id">
+                    <option value="1">Economy Room ($3)</option>
+                    <option value="2">Standard Room ($5)</option>
+                    <option value="3">Luxury Room ($8)</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Select Features:</label>
+                <div class="features-group">
+                    <input type="checkbox" id="pool-access" name="features[]" value="pool" data-price="3">
+                    <label for="pool-access">Pool Access ($3)</label>
+
+                    <input type="checkbox" id="breakfast" name="features[]" value="breakfast" data-price="5">
+                    <label for="breakfast">Breakfast ($5)</label>
+
+                    <input type="checkbox" id="gym-access" name="features[]" value="gym" data-price="3">
+                    <label for="gym-access">Gym Access ($3)</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="username">Username:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+
+            <div class="form-group">
+                <label for="transfer_code">Transfer Code:</label>
+                <input type="text" id="transfer_code" name="transfer_code" required>
+            </div>
+
+            <div class="form-group">
+                <label for="start_date">Check-in Date:</label>
+                <input type="date" id="start_date" name="start_date"
+                    value="2025-01-10" min="2025-01-10" max="2025-01-31" required>
+            </div>
+
+            <div class="form-group">
+                <label for="end_date">Check-out Date:</label>
+                <input type="date" id="end_date" name="end_date"
+                    value="2025-01-11" min="2025-01-10" max="2025-01-31" required>
+            </div>
+
+            <div class="summary" id="booking-summary">
+                <h3>Booking Summary</h3>
+                <p>Room Cost: <span id="room-cost">$3</span> per night</p>
+                <p>Nights: <span id="nights-count">1</span></p>
+                <p>Features Cost: <span id="features-cost">$0</span></p>
+                <p class="discount" id="discount-text" style="display: none;">
+                    30% Discount Applied: -$<span id="discount-amount">0</span>
+                </p>
+                <p class="total-cost">Total Cost: $<span id="total-cost">3</span></p>
+            </div>
+
+            <button type="submit">Book Room</button>
+        </form>
+
+        <div id="response"></div>
+    </div>
+
+    <script src="../src/booking.js"></script>
+</body>
+
+</html>
