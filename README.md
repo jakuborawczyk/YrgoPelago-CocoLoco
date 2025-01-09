@@ -18,4 +18,4 @@ Dates are checked for availability.
 The transfer code and cost are verified via the API.
 If valid, the booking is saved in the database, and a receipt is generated.
 Completion: Successful bookings deposit the transfer code and redirect users to a confirmation page with a downloadable receipt.
-Visit the live site here: "Update link".
+Visit the live site here: "https://jakuborawczyk.se/Coco-Loco/YrgoPelago-CocoLoco/public/index.php".
