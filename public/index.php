@@ -18,9 +18,12 @@
   </nav>
 
   <div id="home" class="hero" style="animation: fadeIn 1s ease-out;">
+    <div class="heroContainer">
+    </div>
     <div class="hero-content">
     <h1 style="animation: fadeInDown 1s ease-out;">Coco-Loco Resort</h1>
-    <p style="animation: fadeInUp 1s ease-out;">Your Paradise Getaway Awaits</p>
+    <p style="animation: fadeInUp 1s ease-out;">Your Paradise Getaway Awaits <br>
+    ✰✰✰✰</p>
       <a href="#rooms" class="btn" style="animation: fadeInUp 1s ease-out;" >Explore Rooms</a>
     </div>
     <div class="scroll-indicator">↓</div>
