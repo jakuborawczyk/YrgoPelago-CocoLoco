@@ -14,18 +14,21 @@ $check_in_date = htmlspecialchars(trim($_POST['start_date'] ?? ''));
 $check_out_date = htmlspecialchars(trim($_POST['end_date'] ?? ''));
 $transfer_code = htmlspecialchars(trim($_POST['transfer_code'] ?? ''));
 
-
 // Check for empty fields
-if (empty($room_id) || empty($guest_name) || empty($check_in_date) || empty($check_out_date) || empty($transfer_code) ) {
+if (empty($room_id) || empty($guest_name) || empty($check_in_date) || empty($check_out_date) || empty($transfer_code)) {
     die(json_encode(['status' => 'error', 'message' => 'All fields are required.']));
 }
 
 // Check room availability from the calendar
 $stmt = $pdo->prepare("
     SELECT COUNT(*) 
-    FROM calendar_availability 
+    FROM bookings 
     WHERE room_id = :room_id 
-    AND date BETWEEN :check_in_date AND :check_out_date
+    AND (
+        (arrival_date <= :check_in_date AND departure_date > :check_in_date) OR
+        (arrival_date < :check_out_date AND departure_date >= :check_out_date) OR
+        (arrival_date >= :check_in_date AND departure_date <= :check_out_date)
+    )
 ");
 
 $stmt->execute([
@@ -34,7 +37,7 @@ $stmt->execute([
     ':check_out_date' => $check_out_date
 ]);
 
-$isAvailable = $stmt->fetchColumn() > 0;
+$isAvailable = $stmt->fetchColumn() == 0;
 error_log('Room availability: ' . ($isAvailable ? 'Available' : 'Not Available'));
 
 if (!$isAvailable) {
@@ -51,11 +54,10 @@ if (!$room_price) {
 }
 
 // Calculate total cost based on number of nights
-$check_in = new DateTime($check_in_date);// Convert the check-in and check-out dates to DateTime objects
-$check_out = new DateTime($check_out_date);// Convert the check-in and check-out dates to DateTime objects
-$numberOfNights = $check_in->diff($check_out)->days;// Calculate the number of nights
-$totalCost = $numberOfNights * $room_price; // Total cost for the room
-
+$check_in = new DateTime($check_in_date);
+$check_out = new DateTime($check_out_date);
+$numberOfNights = $check_in->diff($check_out)->days;
+$totalCost = $numberOfNights * $room_price;
 
 // Calculate the discount based on the number of nights
 if ($numberOfNights >= 3) {
@@ -67,6 +69,7 @@ if ($numberOfNights >= 3) {
     $discountReason = '';
 }
 
+// Check if features are set and iterate over them
 $features = $_POST['features'] ?? [];
 foreach ($features as $feature) {
     switch ($feature) {
@@ -81,7 +84,6 @@ foreach ($features as $feature) {
             break;
     }
 }
-
 
 // Validate the transfer code
 function checkTransferCode($transfer_code, $total_cost, $api_url) {
@@ -124,6 +126,7 @@ function checkTransferCode($transfer_code, $total_cost, $api_url) {
         return false;  // Invalid or used transfer code
     }
 }
+
 // Check if the transfer code is valid
 if (!checkTransferCode($transfer_code, $totalCost, $api_url)) {
     die(json_encode(['status' => 'error', 'message' => 'Invalid or used transfer code.']));
@@ -144,8 +147,7 @@ if ($stmt->execute([
     ':discount_reason' => $discountReason,
     ':total_cost' => $totalCost
 ])) {
-   
- // Return the booking details in JSON format
+    // Return the booking details in JSON format
     $response = [
         "status" => "success",
         "booking_details" => [
