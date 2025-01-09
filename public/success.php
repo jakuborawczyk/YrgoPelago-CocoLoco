@@ -14,6 +14,6 @@ if ($response['status'] === 'success') {
     echo 'Error: Invalid response.';
 }
 ?>
-
+<link rel="stylesheet" href="../src/success.css">
 
 
