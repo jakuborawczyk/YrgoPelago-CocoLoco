@@ -3,6 +3,9 @@
 <head>
   <title>Coco-Loco Resort</title>
     <link rel="stylesheet" href="../src/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Knewave&display=swap" rel="stylesheet">
 </head>
 <body>
   <nav class="navbar">
@@ -31,7 +34,7 @@
         <div class="room-content">
           <h3>Luxury Suite</h3>
           <p>Ocean-front villa with private pool and premium amenities</p>
-          <span class="price">From $500/night</span>
+          <span class="price">From $8/night</span>
         </div>
       </div>
 
@@ -40,7 +43,7 @@
         <div class="room-content">
           <h3>Standard Room</h3>
           <p>Comfortable room with garden view and modern furnishings</p>
-          <span class="price">From $250/night</span>
+          <span class="price">From $5/night</span>
         </div>
       </div>
 
@@ -49,7 +52,7 @@
         <div class="room-content">
           <h3>Budget Room</h3>
           <p>Cozy room with essential amenities and resort access</p>
-          <span class="price">From $150/night</span>
+          <span class="price">From $3/night</span>
         </div>
       </div>
     </div>

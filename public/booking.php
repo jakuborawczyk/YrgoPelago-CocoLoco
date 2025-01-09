@@ -6,6 +6,8 @@ require_once '../src/functions.php';
 
 // API URL for Transfer Code validation
 $api_url = "https://www.yrgopelago.se/centralbank/transferCode";
+$deposit_url = "https://www.yrgopelago.se/centralbank/deposit";
+$user = "Jakub"; // Replace with your actual username
 
 // Get POST data
 $room_id = isset($_POST['room_id']) ? (int)$_POST['room_id'] : null;
@@ -127,9 +129,57 @@ function checkTransferCode($transfer_code, $total_cost, $api_url) {
     }
 }
 
+// Consume the transfer code
+function consumeTransferCode($transfer_code, $numberOfNights, $deposit_url, $user) {
+    $postData = json_encode([
+        'user' => $user,
+        'transferCode' => $transfer_code,
+        'numberOfDays' => $numberOfNights
+    ]);
+
+    // Initialize cURL session to the API
+    $ch = curl_init($deposit_url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true); 
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+
+    // Execute the request and get the response
+    $response = curl_exec($ch);
+
+    // Log the request
+    error_log('API Deposit Request Data: ' . $postData);
+
+    if ($response === false) {
+        error_log('cURL Error: ' . curl_error($ch));
+        curl_close($ch);
+        return false; // Error in cURL request
+    }
+
+    curl_close($ch);
+
+    // Decode the JSON response
+    $responseData = json_decode($response, true);
+
+    // Log the response for debugging
+    error_log('API Deposit Response: ' . $response);
+
+    if ($responseData && isset($responseData['status']) && $responseData['status'] === 'success') {
+        return true;  // Transfer code consumed successfully
+    } else {
+        error_log('Transfer code consumption failed: ' . print_r($responseData, true));
+        return false;  // Failed to consume transfer code
+    }
+}
+
 // Check if the transfer code is valid
 if (!checkTransferCode($transfer_code, $totalCost, $api_url)) {
     die(json_encode(['status' => 'error', 'message' => 'Invalid or used transfer code.']));
+}
+
+// Consume the transfer code
+if (!consumeTransferCode($transfer_code, $numberOfNights, $deposit_url, $user)) {
+    die(json_encode(['status' => 'error', 'message' => 'Failed to consume transfer code.']));
 }
 
 // Proceed to insert the booking into the database

@@ -63,6 +63,12 @@
     color: #ff6b6b;
   }
 
+  h1 {
+    font-family: "Knewave", serif;
+    font-weight: 400;
+    font-style: normal;
+
+  }
   .hero-content h1 {
     font-size: 4rem;
     margin-bottom: 1rem;
