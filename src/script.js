@@ -87,25 +87,14 @@ calculateTotalCost();
 // Update calendar when room is changed
 function updateCalendar() {
     const roomId = document.getElementById('calendar-room').value;
-    const calendar = document.getElementById('availability-calendar');
-    
     fetch(`book.php?room_id=${roomId}`)
         .then(response => response.text())
         .then(html => {
-            calendar.innerHTML = html;
-        });
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newCalendar = doc.querySelector('.calendar');
+            const calendarContainer = document.querySelector('.calendar-container .calendar');
+            calendarContainer.innerHTML = newCalendar.innerHTML;
+        })
+        .catch(error => console.error('Error updating calendar:', error));
 }
-
-document.addEventListener('DOMContentLoaded', function() {
-    const calendarDays = document.querySelectorAll('.calendar-day:not(.empty)');
-    
-    calendarDays.forEach(day => {
-        day.addEventListener('click', function() {
-            if (!this.classList.contains('booked')) {
-                const date = this.dataset.date;
-                document.getElementById('start_date').value = date;
-                calculateTotalCost();
-            }
-        });
-    });
-});

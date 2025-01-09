@@ -84,16 +84,16 @@ declare(strict_types=1);
     <div class="room-selector">
         <label for="calendar-room">View availability for:</label>
         <select id="calendar-room" onchange="updateCalendar()">
-            <option value="1">Economy Room</option>
-            <option value="2">Standard Room</option>
-            <option value="3">Luxury Room</option>
+            <option value="4">Economy Room</option>
+            <option value="5">Standard Room</option>
+            <option value="6">Luxury Room</option>
         </select>
     </div>
     <div class="calendar" id="availability-calendar"></div>
 
 
-<?php 
 
+    <?php
 
 require_once '../src/database.php';
 
@@ -147,8 +147,6 @@ while ($currentDate <= $endDate) {
     $currentDate->modify('+1 day');
 }
 echo "</div>";
-
-
 ?>
 
 
