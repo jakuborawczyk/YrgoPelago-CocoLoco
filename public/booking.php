@@ -67,8 +67,7 @@ if ($numberOfNights >= 3) {
     $discountReason = '';
 }
 
-$features = $_POST['features'];
-
+$features = $_POST['features'] ?? [];
 foreach ($features as $feature) {
     switch ($feature) {
         case "pool":
