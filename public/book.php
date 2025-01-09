@@ -1,17 +1,23 @@
 <?php
 
-declare(strict_types=1);
+require_once '../src/database.php';
+require_once '../src/functions.php';
+
+$room_id = isset($_GET['room_id']) ? (int)$_GET['room_id'] : 1;
+$bookedDates = getBookedDates($pdo, $room_id);
+
+$startDate = new DateTime('2025-01-10');
+$endDate = new DateTime('2025-01-31');
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coco-Loco Resort</title>
     <link rel="stylesheet" href="../src/bookingstyle.css">
 </head>
-
 <body>
     <div class="booking-form">
         <h1>Coco-Loco Resort Booking</h1>
@@ -79,80 +85,45 @@ declare(strict_types=1);
         <div id="response"></div>
     </div>
 
-
     <div class="calendar-container">
-    <div class="room-selector">
-        <label for="calendar-room">View availability for:</label>
-        <select id="calendar-room" onchange="updateCalendar()">
-            <option value="4">Economy Room</option>
-            <option value="5">Standard Room</option>
-            <option value="6">Luxury Room</option>
-        </select>
+        <div class="room-selector">
+            <label for="calendar-room">View availability for:</label>
+            <select id="calendar-room" onchange="updateCalendar()">
+                <option value="1">Economy Room</option>
+                <option value="2">Standard Room</option>
+                <option value="3">Luxury Room</option>
+            </select>
+        </div>
+        <div class="calendar">
+            <div class="calendar-header">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div class="calendar-grid">
+                <?php
+                $currentDate = clone $startDate;
+                $firstDay = $currentDate->format('w');
+
+                // Add empty cells for days before start date
+                for ($i = 0; $i < $firstDay; $i++) {
+                    echo "<div class='calendar-day empty'></div>";
+                }
+
+                while ($currentDate <= $endDate) {
+                    $dateStr = $currentDate->format('Y-m-d');
+                    $isBooked = isDateBooked($dateStr, $bookedDates);
+                    $class = $isBooked ? 'booked' : 'available';
+                    
+                    echo "<div class='calendar-day {$class}' data-date='{$dateStr}'>";
+                    echo $currentDate->format('j');
+                    echo "</div>";
+                    
+                    $currentDate->modify('+1 day');
+                }
+                ?>
+            </div>
+        </div>
     </div>
-    <div class="calendar" id="availability-calendar"></div>
 
-
-
-    <?php
-
-require_once '../src/database.php';
-
-function getBookedDates($pdo, $room_id) {
-    $stmt = $pdo->prepare("
-        SELECT arrival_date, departure_date 
-        FROM bookings 
-        WHERE room_id = :room_id
-    ");
-    $stmt->execute([':room_id' => $room_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-function isDateBooked($date, $bookedDates) {
-    foreach ($bookedDates as $booking) {
-        if ($date >= $booking['arrival_date'] && $date <= $booking['departure_date']) {
-            return true;
-        }
-    }
-    return false;
-}
-
-$room_id = isset($_GET['room_id']) ? $_GET['room_id'] : 1;
-$bookedDates = getBookedDates($pdo, $room_id);
-
-$startDate = new DateTime('2025-01-10');
-$endDate = new DateTime('2025-01-31');
-
-echo "<div class='calendar-header'>";
-echo "<div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>";
-echo "</div>";
-
-$currentDate = clone $startDate;
-$firstDay = $currentDate->format('w');
-
-echo "<div class='calendar-grid'>";
-// Add empty cells for days before start date
-for ($i = 0; $i < $firstDay; $i++) {
-    echo "<div class='calendar-day empty'></div>";
-}
-
-while ($currentDate <= $endDate) {
-    $dateStr = $currentDate->format('Y-m-d');
-    $isBooked = isDateBooked($dateStr, $bookedDates);
-    $class = $isBooked ? 'booked' : 'available';
-    
-    echo "<div class='calendar-day {$class}' data-date='{$dateStr}'>";
-    echo $currentDate->format('j');
-    echo "</div>";
-    
-    $currentDate->modify('+1 day');
-}
-echo "</div>";
-?>
-
-
-
-
-    </div>
     <div class="calendar-legend">
         <div class="legend-item">
             <span class="legend-color available"></span>
@@ -163,9 +134,7 @@ echo "</div>";
             <span>Booked</span>
         </div>
     </div>
-</div>
 
     <script src="../src/script.js"></script>
 </body>
-
 </html>
