@@ -84,11 +84,11 @@
     <div class="testimonial-grid">
       <div class="testimonial-card scroll-reveal">
         <p class="testimonial-text">"A slice of paradise! The private beach and spa services were incredible."</p>
-        <p class="testimonial-author">- Sarah M.</p>
+        <p class="testimonial-author">- Dad.</p>
       </div>
       <div class="testimonial-card scroll-reveal">
         <p class="testimonial-text">"Perfect getaway with amazing views and stellar service."</p>
-        <p class="testimonial-author">- James R.</p>
+        <p class="testimonial-author">- Mom.</p>
       </div>
     </div>
   </section>

@@ -83,3 +83,29 @@ console.error('Error:', error);
 
 // Initialize calculation
 calculateTotalCost();
+
+// Update calendar when room is changed
+function updateCalendar() {
+    const roomId = document.getElementById('calendar-room').value;
+    const calendar = document.getElementById('availability-calendar');
+    
+    fetch(`book.php?room_id=${roomId}`)
+        .then(response => response.text())
+        .then(html => {
+            calendar.innerHTML = html;
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const calendarDays = document.querySelectorAll('.calendar-day:not(.empty)');
+    
+    calendarDays.forEach(day => {
+        day.addEventListener('click', function() {
+            if (!this.classList.contains('booked')) {
+                const date = this.dataset.date;
+                document.getElementById('start_date').value = date;
+                calculateTotalCost();
+            }
+        });
+    });
+});
